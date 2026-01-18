@@ -29,7 +29,6 @@ function VideoPlaceholder({ index }: VideoPlaceholderProps) {
   const videoSrc = label.videoSrc;
   
   const mainVideoRef = useRef<HTMLVideoElement>(null);
-  const bgVideoRef = useRef<HTMLVideoElement>(null);
   
   /** Random start offset (0-1.5 seconds) - generated once on first video load */
   const startOffsetRef = useRef<number | null>(null);
