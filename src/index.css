@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Syne", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+  --color-surface: #0a0a0b;
+  --color-surface-elevated: #141416;
+  --color-surface-muted: #1c1c1f;
+  --color-border: #2a2a2e;
+  --color-text-primary: #fafafa;
+  --color-text-muted: #71717a;
+  --color-accent: #e4e4e7;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-text-primary antialiased;
+    font-family: var(--font-body);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card img,
+video,
+img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
