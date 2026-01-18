@@ -1,66 +1,101 @@
 /**
  * MediaGallery - Secondary plane showcasing photobooth output
- * Renders an array of video placeholders in a horizontal scrolling layout
+ * Frosted glass card design with blurred backgrounds
  * Mobile-first responsive design
  */
+
+import { useRef } from 'react';
+import sampleVideo from '../../assets/sample_video.mp4';
+import sampleVideo2 from '../../assets/sample_video_2.mp4';
+
+/** Product-style labels for video cards */
+const VIDEO_LABELS = [
+  { name: 'Engagement Party', codes: ['JAN', '20', '2025'], videoSrc: sampleVideo },
+  { name: 'Bridal Shower', codes: ['FEB', '14', '2025'], videoSrc: sampleVideo2 },
+  { name: 'Rehearsal Dinner', codes: ['MAR', '18', '2025'], videoSrc: sampleVideo },
+  { name: 'Wedding Ceremony', codes: ['APR', '25', '2025'], videoSrc: sampleVideo2 },
+  { name: 'Reception', codes: ['APR', '25', '2025'], videoSrc: sampleVideo },
+  { name: 'First Dance', codes: ['APR', '25', '2025'], videoSrc: sampleVideo2 },
+  { name: 'Cake Cutting', codes: ['APR', '25', '2025'], videoSrc: sampleVideo },
+  { name: 'Farewell Brunch', codes: ['APR', '26', '2025'], videoSrc: sampleVideo },
+];
 
 type VideoPlaceholderProps = {
   index: number;
 };
 
 function VideoPlaceholder({ index }: VideoPlaceholderProps) {
+  const label = VIDEO_LABELS[index % VIDEO_LABELS.length];
+  const videoSrc = label.videoSrc;
+  
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
+  const bgVideoRef = useRef<HTMLVideoElement>(null);
+  
+  /** Random start offset (0-1.5 seconds) - generated once on first video load */
+  const startOffsetRef = useRef<number | null>(null);
+  
+  /** Set random start time when video is ready */
+  const handleLoadedMetadata = (videoRef: React.RefObject<HTMLVideoElement | null>) => {
+    if (videoRef.current) {
+      // Generate offset on first call, then reuse
+      if (startOffsetRef.current === null) {
+        startOffsetRef.current = Math.random() * 1.5;
+      }
+      videoRef.current.currentTime = startOffsetRef.current;
+    }
+  };
+
   return (
     <div className="group relative flex-shrink-0">
-      {/* Video frame container - responsive width */}
+      {/* Outer frosted glass frame */}
       <div
-        className="relative w-[176px] ... sm:w-[220px] md:w-[260px] overflow-hidden rounded-lg border border-border bg-surface-elevated transition-all duration-300 group-hover:border-text-muted/30 sm:w-[240px] sm:rounded-xl md:w-[280px]"
-        style={{ aspectRatio: '4 / 3' }}
+        className="relative w-[160px] overflow-hidden rounded-xl border border-white/10 sm:w-[200px] md:w-[240px]"
+        style={{
+          // background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+        }}
       >
-        {/* Scanline effect */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
-          }}
-        />
-        
-        {/* Play button indicator - smaller on mobile */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface-muted/80 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12 md:h-14 md:w-14">
-            <svg
-              className="ml-0.5 h-4 w-4 text-text-muted sm:ml-1 sm:h-5 sm:w-5"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
+        {/* Frame padding - creates the "bigger frame" effect */}
+        <div className="p-2 sm:p-2.5 md:p-3">
+          {/* Inner video container */}
+          <div
+            className="flex justify-center items-center h-full w-full overflow-hidden rounded-lg bg-black/40"
+            style={{ aspectRatio: '4 / 3' }}
+          >
+            
+            {/* Main video */}
+            <video
+              ref={mainVideoRef}
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              onLoadedMetadata={() => handleLoadedMetadata(mainVideoRef)}
+              className="z-10 h-full"
+            />
           </div>
         </div>
         
-        {/* Corner frame markers */}
-        <div className="absolute left-1.5 top-1.5 h-3 w-3 border-l border-t border-text-muted/20 sm:left-2 sm:top-2 sm:h-4 sm:w-4" />
-        <div className="absolute right-1.5 top-1.5 h-3 w-3 border-r border-t border-text-muted/20 sm:right-2 sm:top-2 sm:h-4 sm:w-4" />
-        <div className="absolute bottom-1.5 left-1.5 h-3 w-3 border-b border-l border-text-muted/20 sm:bottom-2 sm:left-2 sm:h-4 sm:w-4" />
-        <div className="absolute bottom-1.5 right-1.5 h-3 w-3 border-b border-r border-text-muted/20 sm:bottom-2 sm:right-2 sm:h-4 sm:w-4" />
-        
-        {/* Video metadata placeholder - responsive padding */}
-        <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 md:bottom-4 md:left-4 md:right-4">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[8px] uppercase tracking-wider text-text-muted/60 sm:text-[9px] md:text-[10px]">
-              Video {String(index + 1).padStart(2, '0')}
-            </span>
-            <span className="font-mono text-[8px] text-text-muted/40 sm:text-[9px] md:text-[10px]">
-              0:00
-            </span>
+        {/* Product label section */}
+        <div className="border-t border-white/5 px-2 py-2 sm:px-2.5 sm:py-2.5 md:px-3 md:py-3">
+          {/* Product name */}
+          <p className="mb-1 font-mono text-[8px] font-medium uppercase tracking-[0.1em] text-white/80 sm:text-[9px] md:text-[10px]">
+            {label.name}
+          </p>
+          
+          {/* Metadata codes */}
+          <div className="flex gap-3 sm:gap-4">
+            {label.codes.map((code, i) => (
+              <span
+                key={i}
+                className="font-mono text-[7px] text-white/40 sm:text-[8px] md:text-[9px]"
+              >
+                {code}
+              </span>
+            ))}
           </div>
-        </div>
-        
-        {/* Recording indicator dot - responsive positioning */}
-        <div className="absolute right-2 top-2 flex items-center gap-1 sm:right-3 sm:top-3 sm:gap-1.5">
-          <div className="h-1 w-1 rounded-full bg-red-500/60 sm:h-1.5 sm:w-1.5" />
-          <span className="font-mono text-[6px] uppercase text-text-muted/40 sm:text-[7px] md:text-[8px]">
-            REC
-          </span>
         </div>
       </div>
     </div>
@@ -75,42 +110,23 @@ export function MediaGallery({ count = 8 }: MediaGalleryProps) {
   const placeholders = Array.from({ length: count }, (_, i) => i);
   
   return (
-    <section className="relative w-full bg-surface-elevated py-6">
-
+    <section className="relative w-full pb-6 pt-2 sm:py-6">
       {/* Horizontal scrolling gallery */}
       <div className="relative">
-        {/* Fade edges - smaller on mobile */}
-        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-surface-elevated to-transparent sm:w-8 md:w-12" />
-        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-r from-transparent to-surface-elevated sm:w-8 md:w-12" />
-        
-        {/* Scrollable container - responsive gap and padding */}
+        {/* Scrollable container */}
         <div
-          className="flex gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 sm:px-6 md:gap-5 md:pb-4"
+          className="flex gap-3 overflow-x-auto pb-2 sm:gap-4 md:gap-5"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {/* Left spacer for centering on large screens */}
-          <div className="hidden w-[calc((100vw-1280px)/2)] flex-shrink-0 lg:block" />
+          {/* Left spacer - starts content 1/3 from left */}
+          <div className="w-[calc(12px)] flex-shrink-0 sm:w-[calc(13.33vw-16px)]" />
           
           {placeholders.map((index) => (
             <VideoPlaceholder key={index} index={index} />
           ))}
           
           {/* Right spacer */}
-          <div className="hidden w-[calc((100vw-1280px)/2)] flex-shrink-0 lg:block" />
-        </div>
-      </div>
-      
-      {/* Mobile scroll indicator */}
-      <div className="mt-4 flex justify-center sm:mt-6 md:hidden">
-        <div className="flex gap-1 sm:gap-1.5">
-          {placeholders.slice(0, 5).map((_, i) => (
-            <div
-              key={i}
-              className={`h-0.5 rounded-full transition-all sm:h-1 ${
-                i === 0 ? 'w-4 bg-text-muted sm:w-6' : 'w-0.5 bg-border sm:w-1'
-              }`}
-            />
-          ))}
+          <div className="w-4 flex-shrink-0 sm:w-6" />
         </div>
       </div>
     </section>

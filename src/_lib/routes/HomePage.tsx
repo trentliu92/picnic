@@ -9,14 +9,12 @@ import { MediaGallery } from '../components/MediaGallery';
 
 export function HomePage() {
   return (
-    <main className="min-h-[100svh] bg-surface relative">
+    <main className="min-h-[100svh] bg-surface">
       {/* Primary plane - Hero visual anchor */}
-      <div>
-        <HeroVisualPanel />
-      </div>
+      <HeroVisualPanel />
       
-      {/* Secondary plane - Video gallery */}
-      <div className="absolute inset-x-0 bottom-0 z-10">
+      {/* Secondary plane - Video gallery - overlaps hero on mobile */}
+      <div className="-mt-4 relative z-20 sm:-mt-8 md:mt-0">
         <MediaGallery count={8} />
       </div>
     </main>
