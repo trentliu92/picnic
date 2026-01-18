@@ -22,7 +22,7 @@ export interface SessionManifest {
 // API base URL - uses proxy in development to avoid CORS issues
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
-  : import.meta.env.VITE_API_BASE_URL;
+  : 'https://fotox-worker.id8-photobooth.workers.dev';
   
 // API functions
 export async function getEvent(eventId: string): Promise<EventData> {
