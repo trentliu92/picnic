@@ -1,6 +1,7 @@
 /**
  * MediaGallery - Secondary plane showcasing photobooth output
  * Renders an array of video placeholders in a horizontal scrolling layout
+ * Mobile-first responsive design
  */
 
 type VideoPlaceholderProps = {
@@ -10,10 +11,10 @@ type VideoPlaceholderProps = {
 function VideoPlaceholder({ index }: VideoPlaceholderProps) {
   return (
     <div className="group relative flex-shrink-0">
-      {/* Video frame container */}
+      {/* Video frame container - responsive width */}
       <div
-        className="relative overflow-hidden rounded-xl border border-border bg-surface-elevated transition-all duration-300 group-hover:border-text-muted/30"
-        style={{ width: '280px', aspectRatio: '9/16' }}
+        className="relative w-[176px] ... sm:w-[220px] md:w-[260px] overflow-hidden rounded-lg border border-border bg-surface-elevated transition-all duration-300 group-hover:border-text-muted/30 sm:w-[240px] sm:rounded-xl md:w-[280px]"
+        style={{ aspectRatio: '4 / 3' }}
       >
         {/* Scanline effect */}
         <div
@@ -23,11 +24,11 @@ function VideoPlaceholder({ index }: VideoPlaceholderProps) {
           }}
         />
         
-        {/* Play button indicator */}
+        {/* Play button indicator - smaller on mobile */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-surface-muted/80 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface-muted/80 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12 md:h-14 md:w-14">
             <svg
-              className="ml-1 h-5 w-5 text-text-muted"
+              className="ml-0.5 h-4 w-4 text-text-muted sm:ml-1 sm:h-5 sm:w-5"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -37,27 +38,27 @@ function VideoPlaceholder({ index }: VideoPlaceholderProps) {
         </div>
         
         {/* Corner frame markers */}
-        <div className="absolute left-2 top-2 h-4 w-4 border-l border-t border-text-muted/20" />
-        <div className="absolute right-2 top-2 h-4 w-4 border-r border-t border-text-muted/20" />
-        <div className="absolute bottom-2 left-2 h-4 w-4 border-b border-l border-text-muted/20" />
-        <div className="absolute bottom-2 right-2 h-4 w-4 border-b border-r border-text-muted/20" />
+        <div className="absolute left-1.5 top-1.5 h-3 w-3 border-l border-t border-text-muted/20 sm:left-2 sm:top-2 sm:h-4 sm:w-4" />
+        <div className="absolute right-1.5 top-1.5 h-3 w-3 border-r border-t border-text-muted/20 sm:right-2 sm:top-2 sm:h-4 sm:w-4" />
+        <div className="absolute bottom-1.5 left-1.5 h-3 w-3 border-b border-l border-text-muted/20 sm:bottom-2 sm:left-2 sm:h-4 sm:w-4" />
+        <div className="absolute bottom-1.5 right-1.5 h-3 w-3 border-b border-r border-text-muted/20 sm:bottom-2 sm:right-2 sm:h-4 sm:w-4" />
         
-        {/* Video metadata placeholder */}
-        <div className="absolute bottom-4 left-4 right-4">
+        {/* Video metadata placeholder - responsive padding */}
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 md:bottom-4 md:left-4 md:right-4">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted/60">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-text-muted/60 sm:text-[9px] md:text-[10px]">
               Video {String(index + 1).padStart(2, '0')}
             </span>
-            <span className="font-mono text-[10px] text-text-muted/40">
+            <span className="font-mono text-[8px] text-text-muted/40 sm:text-[9px] md:text-[10px]">
               0:00
             </span>
           </div>
         </div>
         
-        {/* Recording indicator dot */}
-        <div className="absolute right-3 top-3 flex items-center gap-1.5">
-          <div className="h-1.5 w-1.5 rounded-full bg-red-500/60" />
-          <span className="font-mono text-[8px] uppercase text-text-muted/40">
+        {/* Recording indicator dot - responsive positioning */}
+        <div className="absolute right-2 top-2 flex items-center gap-1 sm:right-3 sm:top-3 sm:gap-1.5">
+          <div className="h-1 w-1 rounded-full bg-red-500/60 sm:h-1.5 sm:w-1.5" />
+          <span className="font-mono text-[6px] uppercase text-text-muted/40 sm:text-[7px] md:text-[8px]">
             REC
           </span>
         </div>
@@ -74,77 +75,39 @@ export function MediaGallery({ count = 8 }: MediaGalleryProps) {
   const placeholders = Array.from({ length: count }, (_, i) => i);
   
   return (
-    <section className="relative w-full bg-surface-elevated py-24">
-      {/* Section header */}
-      <div className="mx-auto mb-12 max-w-7xl px-6">
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.4em] text-text-muted">
-              Gallery
-            </p>
-            <h2
-              className="text-3xl font-light tracking-tight text-text-primary md:text-4xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Recent Captures
-            </h2>
-          </div>
-          
-          {/* Navigation hints */}
-          <div className="hidden items-center gap-2 md:flex">
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface transition-colors hover:border-text-muted/40"
-              aria-label="Scroll left"
-            >
-              <svg className="h-4 w-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface transition-colors hover:border-text-muted/40"
-              aria-label="Scroll right"
-            >
-              <svg className="h-4 w-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      
+    <section className="relative w-full bg-surface-elevated py-6">
+
       {/* Horizontal scrolling gallery */}
       <div className="relative">
-        {/* Fade edges */}
-        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-12 bg-gradient-to-r from-surface-elevated to-transparent" />
-        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-12 bg-gradient-to-l from-surface-elevated to-transparent" />
+        {/* Fade edges - smaller on mobile */}
+        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-surface-elevated to-transparent sm:w-8 md:w-12" />
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-r from-transparent to-surface-elevated sm:w-8 md:w-12" />
         
-        {/* Scrollable container */}
+        {/* Scrollable container - responsive gap and padding */}
         <div
-          className="flex gap-5 overflow-x-auto px-6 pb-4 scrollbar-none"
+          className="flex gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 sm:px-6 md:gap-5 md:pb-4"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {/* Left spacer for centering */}
-          <div className="w-[calc((100vw-1280px)/2)] flex-shrink-0 max-lg:hidden" />
+          {/* Left spacer for centering on large screens */}
+          <div className="hidden w-[calc((100vw-1280px)/2)] flex-shrink-0 lg:block" />
           
           {placeholders.map((index) => (
             <VideoPlaceholder key={index} index={index} />
           ))}
           
           {/* Right spacer */}
-          <div className="w-[calc((100vw-1280px)/2)] flex-shrink-0 max-lg:hidden" />
+          <div className="hidden w-[calc((100vw-1280px)/2)] flex-shrink-0 lg:block" />
         </div>
       </div>
       
       {/* Mobile scroll indicator */}
-      <div className="mt-8 flex justify-center md:hidden">
-        <div className="flex gap-1.5">
+      <div className="mt-4 flex justify-center sm:mt-6 md:hidden">
+        <div className="flex gap-1 sm:gap-1.5">
           {placeholders.slice(0, 5).map((_, i) => (
             <div
               key={i}
-              className={`h-1 rounded-full transition-all ${
-                i === 0 ? 'w-6 bg-text-muted' : 'w-1 bg-border'
+              className={`h-0.5 rounded-full transition-all sm:h-1 ${
+                i === 0 ? 'w-4 bg-text-muted sm:w-6' : 'w-0.5 bg-border sm:w-1'
               }`}
             />
           ))}
