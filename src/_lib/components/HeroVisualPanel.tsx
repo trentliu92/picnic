@@ -4,76 +4,8 @@
  * Mobile-first responsive design
  */
 
-import heroSampleImage from '../../assets/hero_sample_image.png';
-import sampleVerticalVideo from '../../assets/sample_vertical_video.mp4';
-
-type ImagePlaceholderProps = {
-  label: string;
-  aspectRatio: string;
-  className?: string;
-  src?: string;
-};
-
-function ImagePlaceholder({ label, aspectRatio, className = '', src }: ImagePlaceholderProps) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl border border-border bg-surface-elevated sm:rounded-2xl ${className}`}
-      style={{ aspectRatio }}
-    >
-      {src ? (
-        /* Actual image */
-        <img
-          src={src}
-          alt={label}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <>
-          {/* Subtle grid pattern overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `linear-gradient(to right, #fff 1px, transparent 1px),
-                               linear-gradient(to bottom, #fff 1px, transparent 1px)`,
-              backgroundSize: '20px 20px',
-            }}
-          />
-          
-          {/* Corner accents - smaller on mobile */}
-          <div className="absolute left-2 top-2 h-4 w-4 border-l border-t border-border sm:left-3 sm:top-3 sm:h-6 sm:w-6 sm:border-l-2 sm:border-t-2" />
-          <div className="absolute right-2 top-2 h-4 w-4 border-r border-t border-border sm:right-3 sm:top-3 sm:h-6 sm:w-6 sm:border-r-2 sm:border-t-2" />
-          <div className="absolute bottom-2 left-2 h-4 w-4 border-b border-l border-border sm:bottom-3 sm:left-3 sm:h-6 sm:w-6 sm:border-b-2 sm:border-l-2" />
-          <div className="absolute bottom-2 right-2 h-4 w-4 border-b border-r border-border sm:bottom-3 sm:right-3 sm:h-6 sm:w-6 sm:border-b-2 sm:border-r-2" />
-          
-          {/* Center content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 sm:gap-3">
-            {/* Icon placeholder - smaller on mobile */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface-muted sm:h-12 sm:w-12 sm:rounded-xl">
-              <svg
-                className="h-4 w-4 text-text-muted sm:h-5 sm:w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            
-            {/* Label - smaller on mobile */}
-            <span className="px-2 text-center font-mono text-[10px] uppercase tracking-[0.15em] text-text-muted sm:text-xs sm:tracking-[0.2em]">
-              {label}
-            </span>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
+import samplePhoto from '../../assets/sample_photo.png';
+import { MediaCard } from './MediaCard';
 
 export function HeroVisualPanel() {
   return (
@@ -91,42 +23,15 @@ export function HeroVisualPanel() {
       
       {/* Content container - mobile covers most of viewport, desktop centers */}
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-12 md:min-h-[100svh] md:justify-center md:py-24">
-        {/* Header text - compact on mobile */}
-        <div className="mb-4 text-center sm:mb-8 md:mb-16">
-          <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted sm:mb-2 sm:text-[11px] sm:tracking-[0.25em] md:mb-4 md:text-xs md:tracking-[0.3em]">
-            Photobooth System
-          </p>
-          <h1
-            className="text-2xl font-light tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-7xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Tropic
-          </h1>
-        </div>
         
-        {/* Image placeholders - stacked on mobile, side by side on desktop */}
-        <div className="flex w-full max-w-5xl flex-col gap-4 sm:gap-5 md:flex-row md:gap-6 lg:gap-8">
-          {/* Primary placeholder - hide on mobile, show on sm and up */}
-          <div className="hidden sm:block md:flex-[1.618] w-full md:w-auto">
-            <ImagePlaceholder
-              label="Primary Hero Image"
-              aspectRatio="4/3"
-              className="aspect-[16/10] w-full md:aspect-[4/3]"
-              src={heroSampleImage}
-            />
-          </div>
-          
-          {/* Secondary video - full width on mobile, takes up most of viewport height */}
-          <div className="relative h-[65svh] overflow-hidden rounded-2xl border border-border bg-surface-elevated sm:h-auto sm:rounded-2xl md:aspect-[3/4] md:flex-1">
-            <video
-              src={sampleVerticalVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          </div>
+        {/* Primary media - full width on mobile */}
+        <div className="relative w-full max-w-5xl">
+          <MediaCard
+            src={samplePhoto}
+            alt="Primary Hero Image"
+            type="image"
+            aspectRatio="aspect-[1/3]"
+          />
         </div>
       </div>
     </section>

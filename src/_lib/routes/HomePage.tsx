@@ -9,7 +9,7 @@ import { MediaGallery } from '../components/MediaGallery';
 
 export function HomePage() {
   return (
-    <main className="min-h-[100svh] bg-surface">
+    <main className="flex-1 bg-white">
       {/* Primary plane - Hero visual anchor */}
       <HeroVisualPanel />
       

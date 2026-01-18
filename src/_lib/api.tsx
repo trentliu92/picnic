@@ -10,17 +10,20 @@ export interface EventData {
 }
 
 export interface Asset {
-  path: string;
-  kind: 'video' | 'strip_video' | 'image';
+  type: 'photo' | 'video' | 'strip_photo' | 'strip_video';
+  src: string;
+  poster: string | null;
 }
 
 export interface SessionManifest {
   assets: Asset[];
 }
 
-// API base URL - should be configurable via environment variables
-const API_BASE_URL = 'http://localhost:3000/api';
-
+// API base URL - uses proxy in development to avoid CORS issues
+const API_BASE_URL = import.meta.env.DEV
+  ? '/api'
+  : import.meta.env.VITE_API_BASE_URL;
+  
 // API functions
 export async function getEvent(eventId: string): Promise<EventData> {
   const response = await fetch(`${API_BASE_URL}/events/${eventId}`);
@@ -31,11 +34,21 @@ export async function getEvent(eventId: string): Promise<EventData> {
 }
 
 export async function getSessionManifest(sessionId: string): Promise<SessionManifest> {
-  const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/manifest`);
+  const response = await fetch(`${API_BASE_URL}/s/${sessionId}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch session manifest ${sessionId}`);
   }
-  return response.json();
+  
+  // The endpoint returns HTML with embedded JSON in window.GALLERY_ASSETS
+  const html = await response.text();
+  const match = html.match(/window\.GALLERY_ASSETS\s*=\s*(\[[\s\S]*?\]);/);
+  
+  if (!match) {
+    throw new Error(`Failed to parse session manifest from HTML`);
+  }
+  
+  const assets: Asset[] = JSON.parse(match[1]);
+  return { assets };
 }
 
 export function assetUrl(path: string): string {
