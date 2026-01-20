@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 @font-face {
-  font-family: "MyFont";
+  font-family: "Jack";
   src: url("./assets/fonts/Jack.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -11,13 +11,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-body{
-	font-family: 'Jack';
-}
-
 @theme {
   --font-display: "Syne", sans-serif;
-  --font-body: "Space Grotesk", sans-serif;
+  --font-body: "Jack", sans-serif;
   --color-surface: #ffffff;
   --color-surface-elevated: #fafafa;
   --color-surface-muted: #f0f0f0;
