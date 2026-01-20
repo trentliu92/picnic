@@ -11,25 +11,35 @@ const ITEM_WIDTH_PERCENT = 0.8;
 const SCROLL_WIDTH_PERCENT = 0.80;
 
 /**
- * Downloads a media file from a URL
+ * Downloads or shares a media file from a URL
+ * Uses Web Share API on mobile, falls back to opening in new tab
  */
 async function downloadMedia(src: string, type: 'video' | 'photo'): Promise<void> {
-  try {
-    const response = await fetch(src);
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
+  const filename = type === 'video' ? `video-${Date.now()}.mp4` : `photo-${Date.now()}.jpg`;
+  const mimeType = type === 'video' ? 'video/mp4' : 'image/jpeg';
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = type === 'video' ? `video-${Date.now()}.mp4` : `photo-${Date.now()}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Try Web Share API first (works well on mobile)
+  if (navigator.share && navigator.canShare) {
+    try {
+      const response = await fetch(src);
+      const blob = await response.blob();
+      const file = new File([blob], filename, { type: mimeType });
 
-    URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error('Download failed:', error);
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: type === 'video' ? 'Video' : 'Photo',
+        });
+        return;
+      }
+    } catch (error) {
+      // Share was cancelled or failed, fall through to other methods
+      console.log('Share failed or cancelled:', error);
+    }
   }
+
+  // Fallback: open in new tab (user can long-press to save on mobile)
+  window.open(src, '_blank');
 }
 
 /**
