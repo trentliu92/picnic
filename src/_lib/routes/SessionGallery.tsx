@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { getSessionManifest, type SessionManifest, type Asset } from '../api';
+import { getSessionStrips, type SessionStripsResponse, type Strip } from '../api';
 import { DownloadIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -33,16 +33,14 @@ async function downloadMedia(src: string, type: 'video' | 'photo'): Promise<void
 }
 
 /**
- * Filters and sorts assets to show strip videos first, then strip photos
+ * Sorts strips to show strip videos first, then strip photos
  */
-function getStripAssets(assets: Asset[]): Asset[] {
-  return assets
-    .filter((a) => a.type === 'strip_video' || a.type === 'strip_photo')
-    .sort((a, b) => {
-      if (a.type === 'strip_video' && b.type !== 'strip_video') return -1;
-      if (a.type !== 'strip_video' && b.type === 'strip_video') return 1;
-      return 0;
-    });
+function sortStrips(strips: Strip[]): Strip[] {
+  return [...strips].sort((a, b) => {
+    if (a.kind === 'strip_video' && b.kind !== 'strip_video') return -1;
+    if (a.kind !== 'strip_video' && b.kind === 'strip_video') return 1;
+    return 0;
+  });
 }
 
 /**
@@ -54,12 +52,12 @@ function getMaskGradient(isToRight: boolean): string {
 }
 
 type CarouselItemProps = {
-  asset: Asset;
+  strip: Strip;
   isActive: boolean;
   isToRight: boolean;
 };
 
-function CarouselItem({ asset, isActive, isToRight }: CarouselItemProps) {
+function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
   const maskGradient = getMaskGradient(isToRight);
   const maskStyle = isActive ? {} : { maskImage: maskGradient, WebkitMaskImage: maskGradient };
 
@@ -68,10 +66,10 @@ function CarouselItem({ asset, isActive, isToRight }: CarouselItemProps) {
       className="flex-shrink-0 snap-center transition-all duration-300"
       style={{ width: `${ITEM_WIDTH_PERCENT * 100}%`, ...maskStyle }}
     >
-      {asset.type === 'strip_video' ? (
+      {strip.kind === 'strip_video' ? (
         <video
-          src={asset.src}
-          poster={asset.poster ?? undefined}
+          src={strip.url}
+          poster={strip.poster_url ?? undefined}
           playsInline
           preload="metadata"
           autoPlay
@@ -81,7 +79,7 @@ function CarouselItem({ asset, isActive, isToRight }: CarouselItemProps) {
         />
       ) : (
         <img
-          src={asset.src}
+          src={strip.url}
           alt="Photo strip"
           className="w-full h-auto rounded-2xl shadow-lg"
         />
@@ -119,17 +117,17 @@ function PaginationDots({ count, activeIndex, onDotClick }: PaginationDotsProps)
 
 export default function SessionGallery() {
   const { sessionId } = useParams();
-  const [manifest, setManifest] = useState<SessionManifest | null>(null);
+  const [stripsData, setStripsData] = useState<SessionStripsResponse | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sessionId) return;
-    getSessionManifest(sessionId).then(setManifest);
+    getSessionStrips(sessionId).then(setStripsData);
   }, [sessionId]);
 
-  const stripAssets = manifest ? getStripAssets(manifest.assets) : [];
-  const currentAsset = stripAssets[activeIndex];
+  const sortedStrips = stripsData ? sortStrips(stripsData.strips) : [];
+  const currentStrip = sortedStrips[activeIndex];
 
   const handleScroll = useCallback((): void => {
     if (!carouselRef.current) return;
@@ -147,16 +145,16 @@ export default function SessionGallery() {
   }, []);
 
   const handleDownload = (): void => {
-    if (!currentAsset) return;
-    const type = currentAsset.type === 'strip_video' ? 'video' : 'photo';
-    downloadMedia(currentAsset.src, type);
+    if (!currentStrip) return;
+    const type = currentStrip.kind === 'strip_video' ? 'video' : 'photo';
+    downloadMedia(currentStrip.url, type);
   };
 
-  if (!manifest) {
+  if (!stripsData) {
     return <p className="text-center py-8">Loading…</p>;
   }
 
-  const isVideo = currentAsset?.type === 'strip_video';
+  const isVideo = currentStrip?.kind === 'strip_video';
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -166,10 +164,10 @@ export default function SessionGallery() {
         className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 px-4 py-6"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {stripAssets.map((asset, index) => (
+        {sortedStrips.map((strip, index) => (
           <CarouselItem
-            key={index}
-            asset={asset}
+            key={strip.path}
+            strip={strip}
             isActive={index === activeIndex}
             isToRight={index > activeIndex}
           />
@@ -177,12 +175,12 @@ export default function SessionGallery() {
       </div>
 
       <PaginationDots
-        count={stripAssets.length}
+        count={sortedStrips.length}
         activeIndex={activeIndex}
         onDotClick={scrollToIndex}
       />
 
-      {currentAsset && (
+      {currentStrip && (
         <div className="flex w-full justify-center items-center py-6">
           <Button onClick={handleDownload} variant="secondary" size="xl">
             <DownloadIcon className="w-5 h-5 text-black" />

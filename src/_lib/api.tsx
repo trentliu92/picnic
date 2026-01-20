@@ -19,6 +19,20 @@ export interface SessionManifest {
   assets: Asset[];
 }
 
+export interface Strip {
+  kind: 'strip_photo' | 'strip_video';
+  url: string;
+  path: string;
+  poster_url: string | null;
+}
+
+export interface SessionStripsResponse {
+  session_id: string;
+  event_id: number;
+  created_at: string;
+  strips: Strip[];
+}
+
 // API base URL - uses proxy in development to avoid CORS issues
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
@@ -53,4 +67,15 @@ export async function getSessionManifest(sessionId: string): Promise<SessionMani
 
 export function assetUrl(path: string): string {
   return `${API_BASE_URL}/assets/${path}`;
+}
+
+/**
+ * Fetches the strips (photo and video) for a session
+ */
+export async function getSessionStrips(sessionId: string): Promise<SessionStripsResponse> {
+  const response = await fetch(`${API_BASE_URL}/s/${sessionId}/strips`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch session strips ${sessionId}`);
+  }
+  return response.json();
 }
