@@ -10,8 +10,8 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/e/:eventId" element={<EventGallery />} />
-        <Route path="/s/:sessionId" element={<SessionGallery />} />
+        <Route path="/event/:eventId" element={<EventGallery />} />
+        <Route path="/session/:sessionId" element={<SessionGallery />} />
         <Route path="*" element={<div className="flex-1 flex items-center justify-center text-text-muted">Not found</div>} />
       </Routes>
     </div>
