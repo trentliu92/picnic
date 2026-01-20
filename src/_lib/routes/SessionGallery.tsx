@@ -1,8 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback, type RefObject } from 'react';
 import { getSessionStrips, type SessionStripsResponse, type Strip } from '../api';
-import { DownloadIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SaveToPhotosButton } from '@/components/SaveToPhotosButton';
 
 /** Width of each carousel item as a percentage of container */
 const ITEM_WIDTH_PERCENT = 0.8;
@@ -10,37 +9,6 @@ const ITEM_WIDTH_PERCENT = 0.8;
 /** Gap compensation for scroll calculation */
 const SCROLL_WIDTH_PERCENT = 0.80;
 
-/**
- * Downloads or shares a media file from a URL
- * Uses Web Share API on mobile, falls back to opening in new tab
- */
-async function downloadMedia(src: string, type: 'video' | 'photo'): Promise<void> {
-  const filename = type === 'video' ? `video-${Date.now()}.mp4` : `photo-${Date.now()}.jpg`;
-  const mimeType = type === 'video' ? 'video/mp4' : 'image/jpeg';
-
-  // Try Web Share API first (works well on mobile)
-  if (navigator.share && navigator.canShare) {
-    try {
-      const response = await fetch(src);
-      const blob = await response.blob();
-      const file = new File([blob], filename, { type: mimeType });
-
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: type === 'video' ? 'Video' : 'Photo',
-        });
-        return;
-      }
-    } catch (error) {
-      // Share was cancelled or failed, fall through to other methods
-      console.log('Share failed or cancelled:', error);
-    }
-  }
-
-  // Fallback: open in new tab (user can long-press to save on mobile)
-  window.open(src, '_blank');
-}
 
 /**
  * Sorts strips to show strip videos first, then strip photos
@@ -179,17 +147,16 @@ export default function SessionGallery() {
     });
   }, []);
 
-  const handleDownload = (): void => {
-    if (!currentStrip) return;
-    const type = currentStrip.kind === 'strip_video' ? 'video' : 'photo';
-    downloadMedia(currentStrip.url, type);
-  };
-
   if (!stripsData) {
     return <p className="text-center py-8">Loading…</p>;
   }
 
-  const isVideo = currentStrip?.kind === 'strip_video';
+  // Generate filename from strip path
+  const getFilename = (strip: Strip): string => {
+    const ext = strip.kind === 'strip_video' ? 'mp4' : 'jpg';
+    const basename = strip.path.split('/').pop()?.split('.')[0] ?? 'media';
+    return `${basename}.${ext}`;
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -216,11 +183,12 @@ export default function SessionGallery() {
       />
 
       {currentStrip && (
-        <div className="flex w-full justify-center items-center py-6">
-          <Button onClick={handleDownload} variant="secondary" size="xl">
-            <DownloadIcon className="w-5 h-5 text-black" />
-            Download {isVideo ? 'Video' : 'Photo'}
-          </Button>
+        <div className="py-6">
+          <SaveToPhotosButton
+            url={currentStrip.url}
+            filename={getFilename(currentStrip)}
+            mimeType={currentStrip.kind === 'strip_video' ? 'video/mp4' : 'image/jpeg'}
+          />
         </div>
       )}
     </div>
