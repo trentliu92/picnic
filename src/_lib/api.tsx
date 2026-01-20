@@ -22,7 +22,7 @@ export interface SessionManifest {
 // API base URL - uses proxy in development to avoid CORS issues
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
-  : 'https://www.id8.events/api';
+  : 'https://id8.events/api';
   
 // API functions
 export async function getEvent(eventId: string): Promise<EventData> {
