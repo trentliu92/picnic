@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, type RefObject } from 'react';
 import { getSessionStrips, type SessionStripsResponse, type Strip } from '../api';
 import { DownloadIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,6 +51,29 @@ function getMaskGradient(isToRight: boolean): string {
   return `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
 }
 
+/**
+ * Custom hook to handle video autoplay on mobile Safari
+ */
+function useVideoAutoplay(isActive: boolean): RefObject<HTMLVideoElement | null> {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isActive) {
+      // Programmatically play - required for mobile Safari
+      video.play().catch(() => {
+        // Autoplay was prevented - this is expected in some cases
+      });
+    } else {
+      video.pause();
+    }
+  }, [isActive]);
+
+  return videoRef;
+}
+
 type CarouselItemProps = {
   strip: Strip;
   isActive: boolean;
@@ -60,6 +83,7 @@ type CarouselItemProps = {
 function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
   const maskGradient = getMaskGradient(isToRight);
   const maskStyle = isActive ? {} : { maskImage: maskGradient, WebkitMaskImage: maskGradient };
+  const videoRef = useVideoAutoplay(isActive);
 
   return (
     <div
@@ -68,10 +92,11 @@ function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
     >
       {strip.kind === 'strip_video' ? (
         <video
+          ref={videoRef}
           src={strip.url}
           poster={strip.poster_url ?? undefined}
           playsInline
-          preload="metadata"
+          preload="auto"
           autoPlay
           loop
           muted
