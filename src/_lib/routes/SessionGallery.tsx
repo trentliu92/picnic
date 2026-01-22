@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback, type RefObject } from 'react';
 import { getSessionStrips, type SessionStripsResponse, type Strip } from '../api';
 import { SaveToPhotosButton } from '@/components/SaveToPhotosButton';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Loader } from '@/components/ui/loader';
 
 /** Width of each carousel item as a percentage of container */
 const ITEM_WIDTH_PERCENT = 0.8;
@@ -71,7 +71,7 @@ function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
       style={{ width: `${ITEM_WIDTH_PERCENT * 100}%`, ...maskStyle }}
     >
       {isLoading && (
-        <Skeleton className="absolute inset-0 w-full aspect-[2/3] rounded-2xl" />
+        <Loader className="absolute inset-0 w-full aspect-[2/3] rounded-2xl bg-neutral-800" />
       )}
       {strip.kind === 'strip_video' ? (
         <video
@@ -159,7 +159,7 @@ export default function SessionGallery() {
   }, []);
 
   if (!stripsData) {
-    return <p className="text-center py-8">Loading…</p>;
+    return <Loader className="py-16" />;
   }
 
   // Generate filename from strip path

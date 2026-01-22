@@ -33,7 +33,7 @@ export function MediaCard({
   return (
     <div className={`w-full px-2 ${className}`}>
       <div
-        className={`relative overflow-hidden rounded-2xl border border-border bg-surface-elevated ${aspectRatio}`}
+        className={`relative overflow-hidden rounded-2xl border border-border bg-card ${aspectRatio}`}
       >
         {type === 'video' ? (
           <video

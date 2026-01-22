@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getEventThumbnails, type EventThumbnailsResponse, type EventThumbnail } from '../api';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Loader } from '@/components/ui/loader';
 
 type ThumbnailCardProps = {
   thumbnail: EventThumbnail;
@@ -16,7 +16,7 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
       className="group relative block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
     >
       {isLoading && (
-        <Skeleton className="absolute inset-0 w-full aspect-[3/4] rounded-2xl" />
+        <Loader className="absolute inset-0 w-full aspect-[3/4] rounded-2xl bg-neutral-800" />
       )}
       <img
         src={thumbnail.url}
@@ -42,8 +42,8 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
 
 function ThumbnailSkeleton() {
   return (
-    <div className="rounded-2xl overflow-hidden">
-      <Skeleton className="w-full aspect-[3/4]" />
+    <div className="rounded-2xl overflow-hidden bg-neutral-800">
+      <Loader className="w-full aspect-[3/4]" />
     </div>
   );
 }

@@ -15,8 +15,9 @@
  */
 
 import { useState } from 'react';
-import { Download, Loader2, Check, Share } from 'lucide-react';
+import { Download, Check, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/loader';
 import {
   saveToPhotos,
   guessMimeTypeFromFilename,
@@ -95,7 +96,7 @@ export function SaveToPhotosButton({
       case 'loading':
         return (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader size="sm" />
             Preparing...
           </>
         );
