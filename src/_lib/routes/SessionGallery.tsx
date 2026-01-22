@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback, type RefObject } from 'react';
 import { getSessionStrips, type SessionStripsResponse, type Strip } from '../api';
 import { SaveToPhotosButton } from '@/components/SaveToPhotosButton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /** Width of each carousel item as a percentage of container */
 const ITEM_WIDTH_PERCENT = 0.8;
@@ -59,15 +60,19 @@ type CarouselItemProps = {
 };
 
 function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const maskGradient = getMaskGradient(isToRight);
   const maskStyle = isActive ? {} : { maskImage: maskGradient, WebkitMaskImage: maskGradient };
   const videoRef = useVideoAutoplay(isActive);
 
   return (
     <div
-      className="flex-shrink-0 snap-center transition-all duration-300"
+      className="flex-shrink-0 snap-center transition-all duration-300 relative max-w-[250px]"
       style={{ width: `${ITEM_WIDTH_PERCENT * 100}%`, ...maskStyle }}
     >
+      {isLoading && (
+        <Skeleton className="absolute inset-0 w-full aspect-[2/3] rounded-2xl" />
+      )}
       {strip.kind === 'strip_video' ? (
         <video
           ref={videoRef}
@@ -78,13 +83,19 @@ function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
           autoPlay
           loop
           muted
-          className="w-full h-auto rounded-2xl shadow-lg"
+          onCanPlay={() => setIsLoading(false)}
+          className={`w-full h-auto rounded-2xl shadow-lg transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
         />
       ) : (
         <img
           src={strip.url}
           alt="Photo strip"
-          className="w-full h-auto rounded-2xl shadow-lg"
+          onLoad={() => setIsLoading(false)}
+          className={`w-full h-auto rounded-2xl shadow-lg transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
         />
       )}
     </div>

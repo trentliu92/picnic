@@ -21,28 +21,6 @@ export function Header() {
             className="h-12 w-auto sm:h-12"
           />
         </Link>
-
-        {/* Mobile menu button - can be expanded later */}
-        <button 
-          type="button"
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-elevated/60 border border-border/40 text-text-muted hover:text-text-primary hover:bg-surface-muted transition-colors"
-          aria-label="Menu"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            strokeWidth={1.5} 
-            stroke="currentColor" 
-            className="w-5 h-5"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" 
-            />
-          </svg>
-        </button>
       </nav>
     </header>
   );

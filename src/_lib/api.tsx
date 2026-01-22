@@ -33,6 +33,12 @@ export interface SessionStripsResponse {
   strips: Strip[];
 }
 
+export interface EventThumbnail {
+  session_id: string;
+  created_at: string;
+  url: string;
+}
+
 // API base URL - uses proxy in development to avoid CORS issues
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
@@ -76,6 +82,17 @@ export async function getSessionStrips(sessionId: string): Promise<SessionStrips
   const response = await fetch(`${API_BASE_URL}/s/${sessionId}/strips`);
   if (!response.ok) {
     throw new Error(`Failed to fetch session strips ${sessionId}`);
+  }
+  return response.json();
+}
+
+/**
+ * Fetches thumbnail previews for sessions in an event
+ */
+export async function getEventThumbnails(eventId: string, limit = 10): Promise<EventThumbnail[]> {
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}/thumbnails?limit=${limit}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch event thumbnails ${eventId}`);
   }
   return response.json();
 }
