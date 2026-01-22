@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getEventThumbnails, type EventThumbnail } from '../api';
+import { getEventThumbnails, type EventThumbnailsResponse, type EventThumbnail } from '../api';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type ThumbnailCardProps = {
@@ -50,17 +50,19 @@ function ThumbnailSkeleton() {
 
 export default function EventGallery() {
   const { eventId } = useParams();
-  const [thumbnails, setThumbnails] = useState<EventThumbnail[] | null>(null);
+  const [data, setData] = useState<EventThumbnailsResponse | null>(null);
 
   useEffect(() => {
     if (!eventId) return;
-    getEventThumbnails(eventId).then(setThumbnails);
+    getEventThumbnails(eventId).then(setData);
   }, [eventId]);
+
+  const thumbnails = data?.thumbnails ?? [];
 
   return (
     <div className="min-h-screen bg-neutral-950 px-4 py-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {thumbnails === null ? (
+        {data === null ? (
           // Loading skeletons
           Array.from({ length: 6 }, (_, i) => <ThumbnailSkeleton key={i} />)
         ) : thumbnails.length === 0 ? (

@@ -39,6 +39,14 @@ export interface EventThumbnail {
   url: string;
 }
 
+export interface EventThumbnailsResponse {
+  event_id: number;
+  updated_at: string;
+  thumbnails: EventThumbnail[];
+  next_cursor: string | null;
+  has_more: boolean;
+}
+
 // API base URL - uses proxy in development to avoid CORS issues
 const API_BASE_URL = import.meta.env.DEV
   ? '/api'
@@ -89,7 +97,7 @@ export async function getSessionStrips(sessionId: string): Promise<SessionStrips
 /**
  * Fetches thumbnail previews for sessions in an event
  */
-export async function getEventThumbnails(eventId: string, limit = 10): Promise<EventThumbnail[]> {
+export async function getEventThumbnails(eventId: string, limit = 10): Promise<EventThumbnailsResponse> {
   const response = await fetch(`${API_BASE_URL}/events/${eventId}/thumbnails?limit=${limit}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch event thumbnails ${eventId}`);
