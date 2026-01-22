@@ -12,7 +12,7 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
 
   return (
     <Link
-      to={`/s/${thumbnail.session_id}`}
+      to={`/session/${thumbnail.session_id}`}
       className="group relative block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
     >
       {isLoading && (
