@@ -61,7 +61,7 @@ export default function EventGallery() {
 
   return (
     <div className="min-h-screen bg-neutral-950 px-4 py-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
         {data === null ? (
           // Loading skeletons
           Array.from({ length: 6 }, (_, i) => <ThumbnailSkeleton key={i} />)
