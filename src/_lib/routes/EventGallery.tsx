@@ -1,7 +1,31 @@
 import { useParams, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getEventThumbnails, type EventThumbnailsResponse, type EventThumbnail } from '../api';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { getEventThumbnails, type EventThumbnail } from '../api';
 import { Loader } from '@/components/ui/loader';
+
+/** Number of columns based on screen width */
+function useColumnCount(): number {
+  const [columns, setColumns] = useState(() => {
+    if (typeof window === 'undefined') return 2;
+    if (window.innerWidth >= 1024) return 5; // lg
+    if (window.innerWidth >= 768) return 4; // md
+    return 2;
+  });
+
+  useEffect(() => {
+    const handleResize = (): void => {
+      if (window.innerWidth >= 1024) setColumns(5);
+      else if (window.innerWidth >= 768) setColumns(4);
+      else setColumns(2);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return columns;
+}
 
 type ThumbnailCardProps = {
   thumbnail: EventThumbnail;
@@ -48,33 +72,163 @@ function ThumbnailSkeleton() {
   );
 }
 
+/** Gap between grid items in pixels */
+const GAP = 12;
+/** How many rows before the end to trigger loading more */
+const LOAD_MORE_THRESHOLD = 3;
+/** Number of items to fetch per page */
+const PAGE_SIZE = 20;
+
 export default function EventGallery() {
   const { eventId } = useParams();
-  const [data, setData] = useState<EventThumbnailsResponse | null>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const columns = useColumnCount();
 
+  const [thumbnails, setThumbnails] = useState<EventThumbnail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+
+  // Initial fetch
   useEffect(() => {
     if (!eventId) return;
-    getEventThumbnails(eventId).then(setData);
+
+    setIsLoading(true);
+    setThumbnails([]);
+    setNextCursor(null);
+    setHasMore(true);
+
+    getEventThumbnails(eventId, { limit: PAGE_SIZE })
+      .then((data) => {
+        setThumbnails(data.thumbnails);
+        setNextCursor(data.next_cursor);
+        setHasMore(data.has_more);
+      })
+      .finally(() => setIsLoading(false));
   }, [eventId]);
 
-  const thumbnails = data?.thumbnails ?? [];
+  // Fetch more thumbnails
+  const fetchMore = useCallback(async (): Promise<void> => {
+    if (!eventId || isFetchingMore || !hasMore) return;
+
+    setIsFetchingMore(true);
+    try {
+      const data = await getEventThumbnails(eventId, {
+        limit: PAGE_SIZE,
+        cursor: nextCursor,
+      });
+      setThumbnails((prev) => [...prev, ...data.thumbnails]);
+      setNextCursor(data.next_cursor);
+      setHasMore(data.has_more);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [eventId, isFetchingMore, hasMore, nextCursor]);
+
+  // Calculate row count (thumbnails are arranged in rows of `columns` items)
+  const rowCount = Math.ceil(thumbnails.length / columns);
+
+  // Estimate row height based on container width
+  const estimateRowHeight = useCallback((): number => {
+    if (!parentRef.current) return 200;
+    const containerWidth = parentRef.current.offsetWidth;
+    const itemWidth = (containerWidth - GAP * (columns - 1)) / columns;
+    // Aspect ratio is 3:4, so height = width * (4/3)
+    return itemWidth * (4 / 3) + GAP;
+  }, [columns]);
+
+  const virtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: estimateRowHeight,
+    overscan: 5,
+  });
+
+  const virtualRows = virtualizer.getVirtualItems();
+
+  // Check if we need to load more when scrolling near the end
+  useEffect(() => {
+    if (virtualRows.length === 0 || !hasMore || isFetchingMore) return;
+
+    const lastVirtualRow = virtualRows[virtualRows.length - 1];
+    if (lastVirtualRow && lastVirtualRow.index >= rowCount - LOAD_MORE_THRESHOLD) {
+      fetchMore();
+    }
+  }, [virtualRows, rowCount, hasMore, isFetchingMore, fetchMore]);
+
+  // Initial loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-950 px-4 py-6">
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+          {Array.from({ length: 8 }, (_, i) => (
+            <ThumbnailSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (thumbnails.length === 0) {
+    return (
+      <div className="min-h-screen bg-neutral-950 px-4 py-6">
+        <p className="text-center text-neutral-400 py-12">No sessions yet</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-neutral-950 px-4 py-6">
-      <div className="grid gap-3 grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
-        {data === null ? (
-          // Loading skeletons
-          Array.from({ length: 6 }, (_, i) => <ThumbnailSkeleton key={i} />)
-        ) : thumbnails.length === 0 ? (
-          <p className="col-span-full text-center text-neutral-400 py-12">
-            No sessions yet
-          </p>
-        ) : (
-          thumbnails.map((thumb) => (
-            <ThumbnailCard key={thumb.session_id} thumbnail={thumb} />
-          ))
-        )}
+    <div
+      ref={parentRef}
+      className="min-h-screen bg-neutral-950 px-4 py-6 overflow-auto"
+    >
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {virtualRows.map((virtualRow) => {
+          const rowIndex = virtualRow.index;
+          const startIndex = rowIndex * columns;
+          const rowThumbnails = thumbnails.slice(startIndex, startIndex + columns);
+
+          return (
+            <div
+              key={virtualRow.key}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: `${virtualRow.size}px`,
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              <div
+                className="grid gap-3"
+                style={{
+                  gridTemplateColumns: `repeat(${columns}, 1fr)`,
+                }}
+              >
+                {rowThumbnails.map((thumb) => (
+                  <ThumbnailCard key={thumb.session_id} thumbnail={thumb} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+      {/* Loading indicator at the bottom */}
+      {isFetchingMore && (
+        <div className="flex justify-center py-4">
+          <Loader className="w-8 h-8" />
+        </div>
+      )}
     </div>
   );
 }

@@ -96,9 +96,21 @@ export async function getSessionStrips(sessionId: string): Promise<SessionStrips
 
 /**
  * Fetches thumbnail previews for sessions in an event
+ * @param eventId - The event ID to fetch thumbnails for
+ * @param options - Pagination options
+ * @param options.limit - Number of thumbnails to fetch (default 20)
+ * @param options.cursor - Cursor for pagination (optional)
  */
-export async function getEventThumbnails(eventId: string, limit = 10): Promise<EventThumbnailsResponse> {
-  const response = await fetch(`${API_BASE_URL}/events/${eventId}/thumbnails?limit=${limit}`);
+export async function getEventThumbnails(
+  eventId: string,
+  options: { limit?: number; cursor?: string | null } = {}
+): Promise<EventThumbnailsResponse> {
+  const { limit = 20, cursor } = options;
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) {
+    params.set('cursor', cursor);
+  }
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}/thumbnails?${params}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch event thumbnails ${eventId}`);
   }
