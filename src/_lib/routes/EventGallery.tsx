@@ -89,8 +89,7 @@ export default function EventGallery() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const fetchingRef = useRef(false);
-  const lastFetchedAtRowCountRef = useRef(-1);
+  const hasFetchedForCurrentDataRef = useRef(false);
 
   // Initial fetch
   useEffect(() => {
@@ -100,8 +99,8 @@ export default function EventGallery() {
     setThumbnails([]);
     setNextCursor(null);
     setHasMore(true);
-    fetchingRef.current = false;
-    lastFetchedAtRowCountRef.current = -1;
+    setIsFetchingMore(false);
+    hasFetchedForCurrentDataRef.current = false;
 
     getEventThumbnails(eventId, { limit: PAGE_SIZE })
       .then((data) => {
@@ -114,9 +113,9 @@ export default function EventGallery() {
 
   // Fetch more thumbnails
   const fetchMore = useCallback(async (): Promise<void> => {
-    if (!eventId || fetchingRef.current || !hasMore) return;
+    if (!eventId || isFetchingMore || !hasMore || !nextCursor || hasFetchedForCurrentDataRef.current) return;
 
-    fetchingRef.current = true;
+    hasFetchedForCurrentDataRef.current = true;
     setIsFetchingMore(true);
     try {
       const data = await getEventThumbnails(eventId, {
@@ -126,14 +125,21 @@ export default function EventGallery() {
       setThumbnails((prev) => [...prev, ...data.thumbnails]);
       setNextCursor(data.next_cursor);
       setHasMore(data.has_more);
+    } catch (error) {
+      console.error('Failed to fetch more thumbnails:', error);
+      hasFetchedForCurrentDataRef.current = false; // Reset on error
     } finally {
       setIsFetchingMore(false);
-      fetchingRef.current = false;
     }
-  }, [eventId, hasMore, nextCursor]);
+  }, [eventId, isFetchingMore, hasMore, nextCursor]);
 
   // Calculate row count (thumbnails are arranged in rows of `columns` items)
   const rowCount = Math.ceil(thumbnails.length / columns);
+
+  // Reset the fetch guard when new data arrives
+  useEffect(() => {
+    hasFetchedForCurrentDataRef.current = false;
+  }, [thumbnails.length]);
 
   // Estimate row height based on container width
   const estimateRowHeight = useCallback((): number => {
@@ -155,15 +161,10 @@ export default function EventGallery() {
 
   // Check if we need to load more when scrolling near the end
   useEffect(() => {
-    if (virtualRows.length === 0 || !hasMore || fetchingRef.current) return;
+    if (!virtualRows.length || !hasMore) return;
 
     const lastVirtualRow = virtualRows[virtualRows.length - 1];
-    const threshold = rowCount - LOAD_MORE_THRESHOLD;
-    
-    // Only fetch if we're past the threshold AND rowCount has changed since last fetch
-    // This ensures we only fetch once per batch of new data
-    if (lastVirtualRow && lastVirtualRow.index >= threshold && lastFetchedAtRowCountRef.current !== rowCount) {
-      lastFetchedAtRowCountRef.current = rowCount;
+    if (lastVirtualRow && lastVirtualRow.index >= rowCount - LOAD_MORE_THRESHOLD) {
       fetchMore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
