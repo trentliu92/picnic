@@ -13,7 +13,7 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
   return (
     <Link
       to={`/session/${thumbnail.session_id}`}
-      className="group relative block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
+      className="group flex flex-col block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
     >
       {isLoading && (
         <Loader className="absolute inset-0 w-full aspect-[720/1525] rounded-2xl bg-neutral-800" />
@@ -26,7 +26,7 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
           isLoading ? 'opacity-0' : 'opacity-100'
         } group-hover:scale-105 group-active:scale-100`}
       />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8">
+      <div className="mt-2 inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8">
         <time className="text-xs text-white/80 font-medium">
           {new Date(thumbnail.created_at).toLocaleString(undefined, {
             month: 'short',

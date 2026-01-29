@@ -71,7 +71,7 @@ function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
       style={{ width: `${ITEM_WIDTH_PERCENT * 100}%`, ...maskStyle }}
     >
       {isLoading && (
-        <Loader className="absolute inset-0 w-full aspect-[2/3] rounded-2xl bg-neutral-800" />
+        <Loader className="absolute inset-0 w-full aspect-[720/1525] rounded-2xl bg-neutral-800" />
       )}
       {strip.kind === 'strip_video' ? (
         <video
