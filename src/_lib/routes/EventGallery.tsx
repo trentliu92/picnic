@@ -90,6 +90,7 @@ export default function EventGallery() {
   const [hasMore, setHasMore] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const fetchingRef = useRef(false);
+  const lastFetchedAtRowCountRef = useRef(-1);
 
   // Initial fetch
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function EventGallery() {
     setNextCursor(null);
     setHasMore(true);
     fetchingRef.current = false;
+    lastFetchedAtRowCountRef.current = -1;
 
     getEventThumbnails(eventId, { limit: PAGE_SIZE })
       .then((data) => {
@@ -156,7 +158,12 @@ export default function EventGallery() {
     if (virtualRows.length === 0 || !hasMore || fetchingRef.current) return;
 
     const lastVirtualRow = virtualRows[virtualRows.length - 1];
-    if (lastVirtualRow && lastVirtualRow.index >= rowCount - LOAD_MORE_THRESHOLD) {
+    const threshold = rowCount - LOAD_MORE_THRESHOLD;
+    
+    // Only fetch if we're past the threshold AND rowCount has changed since last fetch
+    // This ensures we only fetch once per batch of new data
+    if (lastVirtualRow && lastVirtualRow.index >= threshold && lastFetchedAtRowCountRef.current !== rowCount) {
+      lastFetchedAtRowCountRef.current = rowCount;
       fetchMore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
