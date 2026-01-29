@@ -194,7 +194,7 @@ export default function SessionGallery() {
       />
 
       {currentStrip && (
-        <div className="pt-2 pb-6">
+        <div className="pt-2 pb-16">
           <SaveToPhotosButton
             url={currentStrip.url}
             filename={getFilename(currentStrip)}
