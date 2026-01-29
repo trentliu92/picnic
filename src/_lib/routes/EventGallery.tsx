@@ -77,7 +77,7 @@ const GAP = 12;
 /** How many rows before the end to trigger loading more */
 const LOAD_MORE_THRESHOLD = 3;
 /** Number of items to fetch per page */
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default function EventGallery() {
   const { eventId } = useParams();
