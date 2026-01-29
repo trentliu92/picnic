@@ -16,7 +16,7 @@ export function HeroVisualPanel() {
           type="video"
           aspectRatio="aspect-[9/16]"
         />
-        <div className="text-primary text-7xl font-light tracking-widest uppercase absolute bottom-0 left-0 w-full px-8 py-4">
+        <div className="text-primary text-7xl font-light tracking-widest uppercase absolute bottom-0 left-0 w-full px-8 py-6">
         Never miss a moment
       </div>
     </section>
