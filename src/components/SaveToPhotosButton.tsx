@@ -136,13 +136,6 @@ export function SaveToPhotosButton({
           <span>{hint}</span>
         </div>
       )}
-
-      {/* Static hint for iOS users */}
-      {state === 'idle' && !hint && (
-        <p className="text-xs text-gray-400">
-          Opens share sheet to save to camera roll
-        </p>
-      )}
     </div>
   );
 }

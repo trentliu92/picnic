@@ -174,7 +174,7 @@ export default function SessionGallery() {
       <div
         ref={carouselRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 px-4 py-6"
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 pl-4 pr-16 py-6"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {sortedStrips.map((strip, index) => (
@@ -194,7 +194,7 @@ export default function SessionGallery() {
       />
 
       {currentStrip && (
-        <div className="py-6">
+        <div className="pt-2 pb-6">
           <SaveToPhotosButton
             url={currentStrip.url}
             filename={getFilename(currentStrip)}
