@@ -161,10 +161,11 @@ export default function EventGallery() {
 
   // Check if we need to load more when scrolling near the end
   useEffect(() => {
-    if (!virtualRows.length || !hasMore) return;
+    if (!virtualRows.length || !hasMore || hasFetchedForCurrentDataRef.current) return;
 
     const lastVirtualRow = virtualRows[virtualRows.length - 1];
     if (lastVirtualRow && lastVirtualRow.index >= rowCount - LOAD_MORE_THRESHOLD) {
+      hasFetchedForCurrentDataRef.current = true;
       fetchMore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
