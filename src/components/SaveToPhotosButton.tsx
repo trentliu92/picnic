@@ -46,7 +46,7 @@ export function SaveToPhotosButton({
   filename,
   mimeType,
   className,
-  variant = 'secondary',
+  variant = 'default',
   size = 'xl',
 }: SaveToPhotosButtonProps) {
   const [state, setState] = useState<ButtonState>('idle');
@@ -124,7 +124,7 @@ export function SaveToPhotosButton({
         disabled={state === 'loading'}
         variant={variant}
         size={size}
-        className={className}
+        className={`bg-primary text-primary-foreground hover:bg-primary/90 ${className}`}
       >
         {getButtonContent()}
       </Button>
