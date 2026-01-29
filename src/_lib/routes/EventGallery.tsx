@@ -16,13 +16,13 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
       className="group relative block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
     >
       {isLoading && (
-        <Loader className="absolute inset-0 w-full aspect-[3/4] rounded-2xl bg-neutral-800" />
+        <Loader className="absolute inset-0 w-full aspect-[720/1525] rounded-2xl bg-neutral-800" />
       )}
       <img
         src={thumbnail.url}
         alt="Session thumbnail"
         onLoad={() => setIsLoading(false)}
-        className={`w-full aspect-[3/4] object-cover transition-all duration-300 ${
+        className={`w-full aspect-[720/1525] object-cover transition-all duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
         } group-hover:scale-105 group-active:scale-100`}
       />
@@ -43,7 +43,7 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
 function ThumbnailSkeleton() {
   return (
     <div className="rounded-2xl overflow-hidden bg-neutral-800">
-      <Loader className="w-full aspect-[3/4]" />
+      <Loader className="w-full aspect-[720/1525]" />
     </div>
   );
 }

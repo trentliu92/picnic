@@ -18,7 +18,7 @@ import {
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/80">
-      <nav className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
+      <nav className="flex items-center justify-between px-4 py-2 max-w-7xl mx-auto">
         {/* Logo - links to home */}
         <Link 
           to="/" 

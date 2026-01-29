@@ -174,7 +174,7 @@ export default function SessionGallery() {
       <div
         ref={carouselRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 pl-4 pr-16 py-6"
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 pl-4 pr-16 py-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {sortedStrips.map((strip, index) => (
