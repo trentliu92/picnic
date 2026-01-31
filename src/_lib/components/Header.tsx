@@ -63,6 +63,15 @@ export function Header() {
               </SheetClose>
               <SheetClose asChild>
                 <Link
+                  to="/frames"
+                  className="group relative py-4 px-4 text-primary font-light tracking-wide transition-all duration-300 hover:text-primary hover:bg-primary/5 hover:pl-6 text-xl"
+                >
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-px bg-primary transition-all duration-300 group-hover:w-2" />
+                  Frames
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
                   to="/event/1"
                   className="group relative py-4 px-4 text-primary font-light tracking-wide transition-all duration-300 hover:text-primary hover:bg-primary/5 hover:pl-6 text-xl"
                 >

@@ -85,8 +85,9 @@ export default function EventGallery() {
       } catch (error) {
         console.error('Failed to fetch thumbnails:', error);
       } finally {
-        if (!isActive) return;
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     };
 

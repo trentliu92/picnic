@@ -1,8 +1,9 @@
-import { Routes, Route } from "react-router-dom"
-import EventGallery from "./_lib/routes/EventGallery"
-import SessionGallery from "./_lib/routes/SessionGallery"
-import { HomePage } from "./_lib/routes/HomePage"
-import { Header } from "./_lib/components/Header"
+import { Route, Routes } from 'react-router-dom';
+import EventGallery from './_lib/routes/EventGallery';
+import FramesGallery from './_lib/routes/FramesGallery';
+import { Header } from './_lib/components/Header';
+import { HomePage } from './_lib/routes/HomePage';
+import SessionGallery from './_lib/routes/SessionGallery';
 
 export default function App() {
   return (
@@ -12,10 +13,18 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/event/:eventId" element={<EventGallery />} />
+          <Route path="/frames" element={<FramesGallery />} />
           <Route path="/session/:sessionId" element={<SessionGallery />} />
-          <Route path="*" element={<div className="flex-1 flex items-center justify-center text-muted-foreground">Not found</div>} />
+          <Route
+            path="*"
+            element={
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                Not found
+              </div>
+            }
+          />
         </Routes>
       </div>
     </div>
-  )
+  );
 }
