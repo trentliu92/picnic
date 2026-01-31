@@ -16,7 +16,9 @@ function ThumbnailCard({ thumbnail }: ThumbnailCardProps) {
       className="group flex flex-col block overflow-hidden rounded-2xl bg-neutral-900 shadow-lg active:scale-[0.98] transition-transform duration-150"
     >
       {isLoading && (
-        <Loader className="absolute inset-0 w-full aspect-[720/1525] rounded-2xl bg-neutral-800" />
+        <div className="absolute inset-0 w-full aspect-[720/1525] rounded-2xl bg-neutral-800 flex items-center justify-center">
+          <Loader className="w-8 h-8" />
+        </div>
       )}
       <img
         src={thumbnail.url}
