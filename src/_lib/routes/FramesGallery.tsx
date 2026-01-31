@@ -69,7 +69,7 @@ function FrameCard({ frame, onClick }: FrameCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="group p-1 relative flex flex-col text-left overflow-hidden rounded bg-neutral-700 shadow-lg active:scale-[0.98] transition-transform duration-150"
+      className="group p-1 relative flex flex-col text-left overflow-hidden rounded bg-neutral-800 shadow-lg active:scale-[0.98] transition-transform duration-150"
       aria-label={`View frame: ${frame.name}`}
     >
       {isLoading && (
@@ -158,8 +158,8 @@ export default function FramesGallery() {
           </SheetHeader>
 
           {selectedFrame && (
-            <div className="px-4 py-6 bg-neutral-900">
-              <div className="rounded-2xl overflow-hidden bg-neutral-900">
+            <div className="px-4 py-6 bg-neutral-800">
+              <div className="rounded-2xl overflow-hidden bg-neutral-800">
                 <img
                   src={selectedFrame.src}
                   alt={selectedFrame.name}
