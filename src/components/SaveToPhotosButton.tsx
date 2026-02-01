@@ -14,7 +14,7 @@
  * - [ ] Error state shows message if fetch fails
  */
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Download, Check, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
@@ -51,11 +51,27 @@ export function SaveToPhotosButton({
 }: SaveToPhotosButtonProps) {
   const [state, setState] = useState<ButtonState>('idle');
   const [hint, setHint] = useState<string | null>(null);
+  const resetTimeoutRef = useRef<number | null>(null);
 
   const resolvedMimeType = mimeType ?? guessMimeTypeFromFilename(filename);
   const isVideo = resolvedMimeType.startsWith('video/');
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current !== null) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+    };
+  }, []);
+
   async function handleClick(): Promise<void> {
+    // Clear any existing timeout
+    if (resetTimeoutRef.current !== null) {
+      clearTimeout(resetTimeoutRef.current);
+      resetTimeoutRef.current = null;
+    }
+
     setState('loading');
     setHint(null);
 
@@ -70,11 +86,12 @@ export function SaveToPhotosButton({
         setState('success');
         setHint(result.message);
 
-        // Reset after 5 seconds
-        setTimeout(() => {
+        // Reset after 3 seconds
+        resetTimeoutRef.current = window.setTimeout(() => {
           setState('idle');
           setHint(null);
-        }, 5000);
+          resetTimeoutRef.current = null;
+        }, 3000);
       } else {
         // Share was cancelled
         setState('idle');
@@ -84,9 +101,10 @@ export function SaveToPhotosButton({
       setState('hint');
       setHint('Something went wrong. Try long-pressing the media to save.');
 
-      setTimeout(() => {
+      resetTimeoutRef.current = window.setTimeout(() => {
         setState('idle');
         setHint(null);
+        resetTimeoutRef.current = null;
       }, 5000);
     }
   }

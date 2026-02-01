@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Loader } from '@/components/ui/loader';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { SaveToPhotosButton } from '@/components/SaveToPhotosButton';
 import { cn } from '@/lib/utils';
 
 interface FrameItem {
@@ -158,7 +159,7 @@ export default function FramesGallery() {
           </SheetHeader>
 
           {selectedFrame && (
-            <div className="px-4 py-6 bg-neutral-800">
+            <div className="px-4 py-6 bg-neutral-800 flex flex-col gap-4">
               <div className="rounded-2xl overflow-hidden bg-neutral-800">
                 <img
                   src={selectedFrame.src}
@@ -166,6 +167,11 @@ export default function FramesGallery() {
                   className="w-full h-auto max-h-[70svh] object-contain"
                 />
               </div>
+              <SaveToPhotosButton
+                url={selectedFrame.src}
+                filename={selectedFrame.fileName}
+                mimeType="image/png"
+              />
             </div>
           )}
         </SheetContent>
