@@ -147,13 +147,6 @@ export function SaveToPhotosButton({
         {getButtonContent()}
       </Button>
 
-      {/* Hint message - shows after share sheet opens or on fallback */}
-      {hint && (
-        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-full animate-in fade-in slide-in-from-bottom-2">
-          <Share className="w-4 h-4" />
-          <span>{hint}</span>
-        </div>
-      )}
     </div>
   );
 }

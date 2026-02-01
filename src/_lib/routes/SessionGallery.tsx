@@ -67,7 +67,7 @@ function CarouselItem({ strip, isActive, isToRight }: CarouselItemProps) {
 
   return (
     <div
-      className="flex-shrink-0 snap-center transition-all duration-300 relative max-w-[250px]"
+      className="flex-shrink-0 snap-center transition-all duration-300 relative"
       style={{ width: `${ITEM_WIDTH_PERCENT * 100}%`, ...maskStyle }}
     >
       {isLoading && (
